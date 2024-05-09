@@ -1,0 +1,22 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+
+  config.vm.define "otus" do |otus|
+    otus.vm.hostname = "otus"
+    otus.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+    end
+    otus.vm.provision "shell", inline: <<-SHELL
+      uname -a
+      sudo add-apt-repository ppa:cappelikan/ppa
+      sudo apt update
+      sudo apt install -y mainline
+      sudo mainline install-latest
+      sudo systemctl start reboot.target
+    SHELL
+  end
+
+end 
