@@ -1,0 +1,31 @@
+---
+- name: Configure webserver with Nginx
+  hosts: webservers
+  become: true
+
+  vars:
+    conf_file: /etc/nginx/sites-available/default
+    server_name: localhost
+    nginx_listen_port: 8080
+
+  handlers:
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+  tasks:
+    - name: Ensure nginx is installed
+      package:
+        name: nginx
+        update_cache: true
+      notify: Restart nginx
+
+    - name: Manage nginx config template
+      template:
+        src: nginx.conf.j2
+        dest: "{{ conf_file }}"
+        mode: 0644
+      notify: Restart nginx
+...
