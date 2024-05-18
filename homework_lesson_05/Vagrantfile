@@ -1,0 +1,25 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+
+  config.vm.define "otus" do |otus|
+    otus.vm.hostname = "otus"
+    config.vm.disk :disk, name: "testdisk1", size: "1GB"
+    config.vm.disk :disk, name: "testdisk2", size: "1GB"
+    config.vm.disk :disk, name: "testdisk3", size: "1GB"
+    otus.vm.provider "virtualbox" do |virtualbox|
+      virtualbox.cpus = "2"
+      virtualbox.memory = "1024"
+      virtualbox.name = "homework_lesson_05"
+    end
+    otus.vm.provision "shell", inline: <<-SHELL
+      sudo mdadm --zero-superblock /dev/sd[c-e]
+      echo y | sudo mdadm --create /dev/md0 -l 5 -n 3 /dev/sd[c-e]
+      sudo mdadm --detail --scan | sudo tee /etc/mdadm/mdadm.conf
+      sudo update-initramfs -u
+    SHELL
+  end
+
+end 
